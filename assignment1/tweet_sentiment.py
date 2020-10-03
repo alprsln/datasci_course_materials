@@ -18,12 +18,15 @@ def main():
     
     for line in tweet_file:
         sum = 0
-        tweetText = json.loads(line)["data"]["text"].encode('utf-8') #parse every tweet text
-        #print re.findall(r"[\w']+", tweetText)
-        for word in re.findall(r"[\w']+", tweetText): #Regex each word out
-            if scores.has_key(word.lower()):
-                sum += scores[word.lower()]
-        print sum
+        try:
+            tweetText = json.loads(line)["text"].encode('utf-8') #parse every tweet text
+            #print re.findall(r"[\w']+", tweetText)
+            for word in re.findall(r"[\w']+", tweetText): #Regex each word out
+                if scores.has_key(word.lower()):
+                    sum += scores[word.lower()]
+            print sum
+        except:
+            pass
 
     #lines(sent_file)
     #lines(tweet_file)

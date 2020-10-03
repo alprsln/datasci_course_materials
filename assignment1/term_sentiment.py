@@ -20,34 +20,36 @@ def main():
     
     for line in tweet_file:
         _sum = 0
-        tweetText = json.loads(line)["data"]["text"].encode('utf-8') #parse every tweet text
-        tweetWords = re.findall(r"[\w']+", tweetText) #Regex each word out
-        lineDict = {} #{word, score}
-        for wordCaps in tweetWords: 
-            word = wordCaps.lower()
-            #if word isn't in AFINN, add to dict
-            if not scores.has_key(word):
-                if not lineDict.has_key(word):
-                    lineDict[word] = 0
-            #if word is in AFINN, add to score
-            if scores.has_key(word): 
-                _sum += scores[word]
-        #add accumulated score to all nonAFINN words
-        for word in lineDict: 
-            #print(word)
-            lineDict[word] = _sum
-        #merge lineDict into unknownDict
-        for word in lineDict:
-            if not unknownDict.has_key(word):
-                unknownDict[word] = [lineDict[word]]
-            else:
-                unknownDict[word].append(lineDict[word])
-        #print _sum
+        try:
+            tweetText = json.loads(line)["text"].encode('utf-8') #parse every tweet text
+            tweetWords = re.findall(r"[\w']+", tweetText) #Regex each word out
+            lineDict = {} #{word, score}
+            for wordCaps in tweetWords: 
+                word = wordCaps.lower()
+                #if word isn't in AFINN, add to dict
+                if not scores.has_key(word):
+                    if not lineDict.has_key(word):
+                        lineDict[word] = 0
+                #if word is in AFINN, add to score
+                if scores.has_key(word): 
+                    _sum += scores[word]
+            #add accumulated score to all nonAFINN words
+            for word in lineDict: 
+                #print(word)
+                lineDict[word] = _sum
+            #merge lineDict into unknownDict
+            for word in lineDict:
+                if not unknownDict.has_key(word):
+                    unknownDict[word] = [lineDict[word]]
+                else:
+                    unknownDict[word].append(lineDict[word])
+        except:
+            pass
 
     #Calculate weighted scores of all words in unknownDict
     sentimentDict = {} # {word, weightedScore}
     for word, scores in unknownDict.items():
-        _sum = sum(scores)
+        _sum = sum(scores, 0.0)
         sentimentDict[word] = _sum / len(scores)
 
     for word, score in sentimentDict.items():
